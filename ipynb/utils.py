@@ -69,6 +69,7 @@ def filter_ast(module_ast):
     module_ast.body = [n for n in module_ast.body if node_predicate(n)]
     return module_ast
 
+
 def code_from_ipynb(nb, markdown=False):
     """
     Get the code for a given notebook
@@ -79,7 +80,10 @@ def code_from_ipynb(nb, markdown=False):
     for cell in nb['cells']:
         if cell['cell_type'] == 'code':
             # transform the input to executable Python
-            code += ''.join(cell['source'])
+            # Hack to ignore ipython magic
+            source_list = list(
+                filter(lambda x: r'%%' not in x, cell['source']))
+            code += ''.join(source_list)
         if cell['cell_type'] == 'markdown':
             code += '\n# ' + '# '.join(cell['source'])
         # We want a blank newline after each cell's output.
